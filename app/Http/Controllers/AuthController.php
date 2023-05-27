@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Http\Requests\Register\RegisterRequest;
 use App\Http\Requests\Login\LoginRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -35,5 +37,24 @@ class AuthController extends Controller
 		return response()->json([
 			'message' => 'Successfully logged out',
 		]);
+	}
+
+	public function redirect()
+	{
+		return Socialite::driver('google')->redirect();
+	}
+
+	public function callback()
+	{
+		$googleuser = Socialite::driver('google')->user();
+		$user = User::updateOrCreate([
+			'email' => $googleuser->id,
+		], [
+			'username' => $googleuser->name,
+			'email'    => $googleuser->email,
+		]);
+		Auth::login($user);
+		$token = $user->createToken('authToken')->plainTextToken;
+		return response()->json(['message' => 'User logged in', 'token' => $token], 201);
 	}
 }
