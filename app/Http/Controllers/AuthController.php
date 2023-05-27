@@ -26,7 +26,8 @@ class AuthController extends Controller
 
 	public function store(RegisterRequest $request)
 	{
-		User::create($request->validated());
+		$user = User::create($request->validated());
+		$user->sendEmailVerificationNotification();
 		return response()->json(['message' => 'User created'], 201);
 	}
 
