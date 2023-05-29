@@ -8,14 +8,25 @@
     <title>Email verification</title>
 </head>
 
-<body>
-    <div style="max-width: 600px; margin: 0 auto; text-align: center;">
-        <img src="https://i.ibb.co/K2xVn3t/Landing-Worldwide-2.png" style="width: 100%; max-width: 600px;">
-        <h1 style="font-size: 2em; font-weight: 900; margin-top: 1em; font-family: Inter;">Email verification</h1>
-        <p style="margin-top: 1em; font-family: Inter;">click here to verify</p>
-        <a href="{{ $verificationUrl }}"
-            style="background-color: green; color: white; display: inline-block; padding: 1em; text-decoration: none; margin-top: 1em; width: 30%;">
-            verify email</a>
+<body style="margin: 0; padding: 0; background-color: #11101a;">
+    <div style="max-width: 600px; margin: 0 auto; text-align: left; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://i.ibb.co/K2xVn3t/Landing-Worldwide-2.png"
+                style="width: 30%; max-width: 50px; vertical-align: middle;">
+        </div>
+        <div style="text-align: left;">
+            <h1 style="font-size: 2em; font-weight: 900; margin: 0; color: #ffffff;">Hola, {{ $username }}</h1>
+            <p style="margin: 10px 0 0; color: #ffffff;">Thanks for joining Movie quotes! We really appreciate it.</p>
+            <p style="margin: 10px 0 0; color: #ffffff;">Please click the button below to verify your account:</p>
+            <a href="{{ $verificationUrl }}"
+                style="background-color: #ff0000; color: #ffffff; display: inline-block; padding: 10px 20px; text-decoration: none; margin-top: 10px; border-radius: 5px;">Verify
+                Email</a>
+            <p style="margin: 10px 0 0; color: #ffffff;">If clicking doesn't work, you can try copying and pasting it to
+                your browser:</p>
+            <p style="margin: 10px 0 0; color: #ffd700;">If you have any problems, please contact us:
+                support@moviequotes.ge</p>
+            <p style="margin: 10px 0 0; color: #ffffff;">MovieQuotes Team</p>
+        </div>
     </div>
 </body>
 

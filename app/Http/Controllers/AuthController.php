@@ -17,11 +17,10 @@ class AuthController extends Controller
 		$field = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 		$credentials[$field] = $credentials['login'];
 		unset($credentials['login']);
-		auth()->attempt($credentials, $request->has('remember'));
-		$user = User::where($field, $request->login)->first();
-		$token = $user->createToken('authToken')->plainTextToken;
-		session()->regenerate();
-		return response()->json(['message' => 'User logged in', 'token' => $token], 201);
+		if (auth()->attempt($credentials, $request->has('remember'))) {
+			return response()->json(['message' => 'User logged in'], 201);
+		}
+		return response()->json(['message' => 'Invalid credentials'], 401);
 	}
 
 	public function store(RegisterRequest $request)
@@ -33,11 +32,14 @@ class AuthController extends Controller
 
 	public function logout(Request $request)
 	{
-		$request->user()->tokens()->delete();
+		Auth::guard('web')->logout();
 
+		$request->session()->invalidate();
+
+		$request->session()->regenerateToken();
 		return response()->json([
 			'message' => 'Successfully logged out',
-		]);
+		], 201);
 	}
 
 	public function redirect()
@@ -48,12 +50,10 @@ class AuthController extends Controller
 	public function callback()
 	{
 		$googleuser = Socialite::driver('google')->user();
-		$user = User::updateOrCreate([
-			'email' => $googleuser->id,
-		], [
-			'username' => $googleuser->name,
-			'email'    => $googleuser->email,
-		]);
+		$user = User::updateOrCreate(
+			['email' => $googleuser->email],
+			['username' => $googleuser->name, 'email'=>$googleuser->email]
+		);
 		Auth::login($user);
 		$token = $user->createToken('authToken')->plainTextToken;
 		return response()->json(['message' => 'User logged in', 'token' => $token], 201);

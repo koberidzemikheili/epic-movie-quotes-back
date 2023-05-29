@@ -33,9 +33,11 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldQueue
 	 */
 	public function toMail($notifiable): MailMessage
 	{
+		$username = $notifiable->username; // Replace 'username' with the actual attribute name for the username field in your User model
+
 		return (new MailMessage)->view(
 			'emails.verification',
-			['verificationUrl' => $this->verificationUrl($notifiable)]
+			['verificationUrl' => $this->verificationUrl($notifiable), 'username' => $username]
 		);
 	}
 }
