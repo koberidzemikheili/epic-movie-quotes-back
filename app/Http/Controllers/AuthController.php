@@ -7,6 +7,7 @@ use App\Http\Requests\Register\RegisterRequest;
 use App\Http\Requests\Login\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -54,8 +55,12 @@ class AuthController extends Controller
 			['email' => $googleuser->email],
 			['username' => $googleuser->name, 'email'=>$googleuser->email]
 		);
-		Auth::login($user);
-		$token = $user->createToken('authToken')->plainTextToken;
-		return response()->json(['message' => 'User logged in', 'token' => $token], 201);
+		auth()->login($user);
+		$user->markEmailAsVerified();
+		session()->regenerate();
+		$csrfToken = Crypt::encrypt(csrf_token());
+		$laravelsession = Crypt::encrypt(session()->getId());
+		$response = redirect()->away('http://127.0.0.1:5173')->withCookie('XSRF-TOKEN', $csrfToken)->withCookie('laravel_session', $laravelsession);
+		return $response;
 	}
 }
