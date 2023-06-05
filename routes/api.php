@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\PasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,8 +17,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
-Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');
+Route::post('/register', [AuthController::class, 'store']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/forgot-password', [PasswordController::class, 'PostResetEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,3 +31,5 @@ Route::middleware('auth:sanctum')->group(function () {
 	});
 	Route::post('/logout', [AuthController::class, 'logout']);
 });
+Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
+Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');

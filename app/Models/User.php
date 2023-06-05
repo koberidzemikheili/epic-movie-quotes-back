@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\CustomVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\CustomResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -52,5 +53,11 @@ class User extends Authenticatable implements MustVerifyEmail
 	public function sendEmailVerificationNotification(): void
 	{
 		$this->notify(new CustomVerifyEmail());
+	}
+
+	public function sendPasswordResetNotification($token): void
+	{
+		$url = 'http://localhost:5173/new-password?token=' . $token . '&email=';
+		$this->notify(new CustomResetPasswordNotification($url));
 	}
 }
