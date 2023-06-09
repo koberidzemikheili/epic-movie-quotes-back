@@ -21,7 +21,7 @@ class AuthController extends Controller
 		if (auth()->attempt($credentials, $request->has('remember'))) {
 			return response()->json(['message' => 'User logged in'], 201);
 		}
-		return response()->json(['message' => 'Invalid credentials'], 401);
+		return response()->json(['message' => trans('validation.login')], 401);
 	}
 
 	public function store(RegisterRequest $request)
