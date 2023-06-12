@@ -53,7 +53,7 @@ class AuthController extends Controller
 		$googleuser = Socialite::driver('google')->user();
 		$user = User::updateOrCreate(
 			['email' => $googleuser->email],
-			['username' => $googleuser->name, 'email'=>$googleuser->email]
+			['username' => $googleuser->name, 'email'=>$googleuser->email, 'google_id'=>$googleuser->id],
 		);
 		auth()->login($user);
 		$user->markEmailAsVerified();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EditUserController;
 use App\Http\Controllers\LocalizeController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::middleware('localization')->group(function () {
 			return $request->user();
 		});
 		Route::post('/logout', [AuthController::class, 'logout']);
+		Route::post('/edit', [EditUserController::class, 'update']);
 	});
 	Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
 	Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');
