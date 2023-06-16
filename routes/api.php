@@ -3,10 +3,12 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EditUserController;
 use App\Http\Controllers\LocalizeController;
+use App\Http\Controllers\MovieController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PasswordController;
+use App\Models\Genre;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +36,11 @@ Route::middleware('localization')->group(function () {
 		});
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
+		Route::post('/add-movie', [MovieController::class, 'store']);
+		Route::get('/movie/{movie}', [MovieController::class, 'show']);
+		Route::get('/genres', function () {
+			return response()->json(['genres' => Genre::all()], 201);
+		});
 	});
 	Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
 	Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');

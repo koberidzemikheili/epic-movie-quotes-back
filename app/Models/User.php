@@ -61,4 +61,14 @@ class User extends Authenticatable implements MustVerifyEmail
 		$url = 'http://localhost:5173/new-password?token=' . $token . '&email=';
 		$this->notify(new CustomResetPasswordNotification($url));
 	}
+
+	public function movies()
+	{
+		return $this->hasMany(Movie::class);
+	}
+
+public function quotes()
+{
+	return $this->hasMany(Quote::class);
+}
 }

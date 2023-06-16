@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		Genre::factory(5)->create();
+		$genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Drama', 'Horror', 'Mystery', 'Romance', 'Thriller', 'Fantasy'];
+
+		foreach ($genres as $genre) {
+			Genre::create(['genre' => $genre]);
+		}
 	}
 }
