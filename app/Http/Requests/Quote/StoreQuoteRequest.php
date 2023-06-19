@@ -14,15 +14,10 @@ class StoreQuoteRequest extends FormRequest
 	public function rules(): array
 	{
 		return [
-			'name.en'           => 'required|string|min:3|max:70',
-			'name.ka'           => 'required|string|min:3|max:70',
-			'year'              => 'required|digits:4',
-			'director.en'       => 'required|string|min:3|max:25',
-			'director.ka'       => 'required|string|min:3|max:25',
-			'description.en'    => 'required|string|min:3|max:255',
-			'description.ka'    => 'required|string|min:3|max:255',
-			'movie_image'       => 'required|image',
-			'genres'            => 'required|array',
+			'title.en'          => 'required|min:3|max:255',
+			'title.ka'          => 'required|min:3|max:255',
+			'movie_id'          => 'required',
+			'quote_image'       => 'required|image',
 		];
 	}
 }

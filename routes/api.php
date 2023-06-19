@@ -8,7 +8,10 @@ use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\QuoteController;
 use App\Models\Genre;
+use App\Models\Movie;
+use App\Models\Quote;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +40,18 @@ Route::middleware('localization')->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
 		Route::post('/add-movie', [MovieController::class, 'store']);
+		Route::post('/add-quote', [QuoteController::class, 'store']);
 		Route::get('/movie/{movie}', [MovieController::class, 'show']);
+		Route::get('/usermovies', [MovieController::class, 'usermovies']);
+		Route::get('/movies', function () {
+			return response()->json(['movies' => Movie::all()], 201);
+		});
+		Route::get('/quotes', function () {
+			return response()->json(['quotes' => Quote::all()], 201);
+		});
+		Route::post('/movies/{movie}', [MovieController::class, 'update']);
+		Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
+
 		Route::get('/genres', function () {
 			return response()->json(['genres' => Genre::all()], 201);
 		});
