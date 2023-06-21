@@ -53,7 +53,7 @@ Route::middleware('localization')->group(function () {
 		Route::put('/quote/{quote}', [QuoteController::class, 'update']);
 		Route::delete('/quote/{quote}', [QuoteController::class, 'destroy']);
 		Route::get('/quote', function () {
-			return response()->json(['quotes' => Quote::with(['comments', 'likes'])->get()], 201);
+			return response()->json(['quotes' => Quote::with(['comments.user', 'likes', 'user', 'movie'])->get()], 201);
 		});
 
 		Route::post('/movie', [MovieController::class, 'store']);
