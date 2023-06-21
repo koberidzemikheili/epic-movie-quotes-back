@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\UserController;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Quote;
@@ -42,7 +43,7 @@ Route::middleware('localization')->group(function () {
 		});
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
-		Route::get('/usermovies', [MovieController::class, 'usermovies']);
+		Route::get('/usermovies', [UserController::class, 'usermovies']);
 		Route::get('/user/{user}', function (User $user) {
 			return response()->json(['user' => $user], 201);
 		});

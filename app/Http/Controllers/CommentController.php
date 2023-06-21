@@ -10,12 +10,11 @@ class CommentController extends Controller
 {
 	public function store(StoreCommentRequest $request)
 	{
-		$comment = new Comment();
-		$comment->comment = $request->comment;
-		$comment->user_id = Auth::id();
-		$comment->quote_id = $request->quote_id;
-
-		$comment->save();
+		$comment = Comment::create([
+			'comment'  => $request->comment,
+			'user_id'  => Auth::id(),
+			'quote_id' => $request->quote_id,
+		]);
 
 		return response()->json(['message' => 'successfull'], 201);
 	}

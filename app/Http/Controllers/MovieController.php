@@ -12,67 +12,52 @@ class MovieController extends Controller
 {
 	public function show(Movie $movie)
 	{
-		$movie = Movie::where('id', $movie->id)->with(['genres', 'quotes.comments', 'quotes.likes'])->first();
+		$movie->load(['genres', 'quotes.comments', 'quotes.likes']);
 		return response()->json($movie, 201);
 	}
 
-	public function usermovies()
+	public function store(StoreMovieRequest $request)
 	{
-		$user = Auth::user();
-		$movies = Movie::where('user_id', $user->id)->with('genres', 'quotes')->get();
-		return response()->json(['movies' => $movies], 201);
+		$movie = Movie::create([
+			'name'        => ['en' => $request->name['en'], 'ka' => $request->name['ka']],
+			'year'        => $request->year,
+			'director'    => ['en' => $request->director['en'], 'ka' => $request->director['ka']],
+			'description' => ['en' => $request->description['en'], 'ka' => $request->description['ka']],
+			'user_id'     => Auth::id(),
+			'movie_image' => $request->file('movie_image')->store('movie_images'),
+		]);
+
+		$movie->genres()->attach($request->genres);
+
+		return response()->json(['message' => 'success'], 201);
 	}
 
-public function store(StoreMovieRequest $request)
-{
-	$movie = new Movie();
-	$movie->setTranslation('name', 'en', $request->name['en']);
-	$movie->setTranslation('name', 'ka', $request->name['ka']);
-	$movie->year = $request->year;
-	$movie->setTranslation('director', 'en', $request->director['en']);
-	$movie->setTranslation('director', 'ka', $request->director['ka']);
-	$movie->setTranslation('description', 'en', $request->description['en']);
-	$movie->setTranslation('description', 'ka', $request->description['ka']);
-	$movie->user_id = Auth::id();
-	$attributes['movie_image'] = request()->file('movie_image')->store('movie_images');
-	$movie->movie_image = $attributes['movie_image'];
+	public function update(UpdateMovieRequest $request, Movie $movie)
+	{
+		if ($request->hasFile('movie_image')) {
+			Storage::delete($movie->movie_image);
+			$movie->movie_image = $request->file('movie_image')->store('movie_images');
+		}
 
-	$movie->save();
+		$movie->update([
+			'name'        => ['en' => $request->name['en'], 'ka' => $request->name['ka']],
+			'year'        => $request->year,
+			'director'    => ['en' => $request->director['en'], 'ka' => $request->director['ka']],
+			'description' => ['en' => $request->description['en'], 'ka' => $request->description['ka']],
+			'user_id'     => Auth::id(),
+			'movie_image' => $movie->movie_image,
+		]);
 
-	$movie->genres()->attach($request->genres);
+		if ($request->has('genres')) {
+			$genreIds = array_map(function ($genre) {
+				return $genre['id'];
+			}, $request->genres);
 
-	return response()->json(['message' => 'success'], 201);
-}
+			$movie->genres()->sync($genreIds);
+		}
 
-public function update(UpdateMovieRequest $request, Movie $movie)
-{
-	$movie->setTranslation('name', 'en', $request->name['en']);
-	$movie->setTranslation('name', 'ka', $request->name['ka']);
-	$movie->year = $request->year;
-	$movie->setTranslation('director', 'en', $request->director['en']);
-	$movie->setTranslation('director', 'ka', $request->director['ka']);
-	$movie->setTranslation('description', 'en', $request->description['en']);
-	$movie->setTranslation('description', 'ka', $request->description['ka']);
-	$movie->user_id = Auth::id();
-
-	if ($request->hasFile('movie_image')) {
-		Storage::delete($movie->movie_image);
-		$attributes['movie_image'] = request()->file('movie_image')->store('movie_images');
-		$movie->movie_image = $attributes['movie_image'];
+		return response()->json(['message' => 'success'], 200);
 	}
-
-	$movie->save();
-
-	if ($request->has('genres')) {
-		$genreIds = array_map(function ($genre) {
-			return $genre['id'];
-		}, $request->genres);
-
-		$movie->genres()->sync($genreIds);
-	}
-
-	return response()->json(['message' => 'success'], 200);
-}
 
 public function destroy(Movie $Movie)
 {
