@@ -71,4 +71,9 @@ public function quotes()
 {
 	return $this->hasMany(Quote::class);
 }
+
+public function comments()
+{
+	return $this->hasMany(Comment::class);
+}
 }

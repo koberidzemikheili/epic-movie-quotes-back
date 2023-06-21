@@ -10,12 +10,11 @@ return new class extends Migration {
 	 */
 	public function up(): void
 	{
-		Schema::create('quotes', function (Blueprint $table) {
+		Schema::create('comments', function (Blueprint $table) {
 			$table->id();
-			$table->text('title');
-			$table->foreignId('movie_id')->constrained()->cascadeOnDelete();
+			$table->text('comment');
+			$table->foreignId('quote_id')->constrained()->cascadeOnDelete();
 			$table->foreignId('user_id')->constrained()->onDelete('cascade');
-			$table->string('quote_image')->nullable();
 			$table->timestamps();
 		});
 	}
@@ -25,6 +24,6 @@ return new class extends Migration {
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists('quotes');
+		Schema::dropIfExists('comments');
 	}
 };

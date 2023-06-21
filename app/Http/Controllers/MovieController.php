@@ -12,10 +12,8 @@ class MovieController extends Controller
 {
 	public function show(Movie $movie)
 	{
-		$user = Auth::user();
-		$curretmovie = $user->id;
-		$quotes = $movie->quotes;
-		return response()->json(['movie' => $movie, 'genre'=>$movie->genres, 'quotes'=>$quotes, 'user'=>$curretmovie], 201);
+		$movie = Movie::where('id', $movie->id)->with(['genres', 'quotes.comments', 'quotes.likes'])->first();
+		return response()->json($movie, 201);
 	}
 
 	public function usermovies()
@@ -80,6 +78,6 @@ public function destroy(Movie $Movie)
 {
 	$Movie->delete();
 
-	return response()->json(['message' => 'success'], 200);
+	return response()->json(['message' => 'success'], 201);
 }
 }

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EditUserController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LocalizeController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\VerificationController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\QuoteController;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Quote;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,22 +42,34 @@ Route::middleware('localization')->group(function () {
 		});
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
-		Route::post('/add-movie', [MovieController::class, 'store']);
-		Route::post('/add-quote', [QuoteController::class, 'store']);
-		Route::get('/movie/{movie}', [MovieController::class, 'show']);
 		Route::get('/usermovies', [MovieController::class, 'usermovies']);
-		Route::get('/movies', function () {
+		Route::get('/user/{user}', function (User $user) {
+			return response()->json(['user' => $user], 201);
+		});
+
+		Route::post('/quote', [QuoteController::class, 'store']);
+		Route::get('/quote/{quote}', [QuoteController::class, 'index']);
+		Route::put('/quote/{quote}', [QuoteController::class, 'update']);
+		Route::delete('/quote/{quote}', [QuoteController::class, 'destroy']);
+		Route::get('/quote', function () {
+			return response()->json(['quotes' => Quote::with(['comments', 'likes'])->get()], 201);
+		});
+
+		Route::post('/movie', [MovieController::class, 'store']);
+		Route::get('/movie/{movie}', [MovieController::class, 'show']);
+		Route::put('/movie/{movie}', [MovieController::class, 'update']);
+		Route::delete('/movie/{movie}', [MovieController::class, 'destroy']);
+		Route::get('/movie', function () {
 			return response()->json(['movies' => Movie::all()], 201);
 		});
-		Route::get('/quotes', function () {
-			return response()->json(['quotes' => Quote::all()], 201);
-		});
-		Route::post('/movies/{movie}', [MovieController::class, 'update']);
-		Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
 
 		Route::get('/genres', function () {
 			return response()->json(['genres' => Genre::all()], 201);
 		});
+
+		Route::post('/comment', [CommentController::class, 'store']);
+		Route::post('/like', [LikeController::class, 'store']);
+		Route::delete('/like/{like}', [LikeController::class, 'destroy']);
 	});
 	Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
 	Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');
