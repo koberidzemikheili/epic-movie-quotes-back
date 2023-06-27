@@ -6,6 +6,7 @@ use App\Http\Controllers\EditUserController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LocalizeController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -39,7 +40,9 @@ Route::middleware('localization')->group(function () {
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
 	Route::middleware('auth:sanctum')->group(function () {
 		Route::get('/user', function (Request $request) {
-			return $request->user();
+			return $request->user()->load(['notificationsReceived' => function ($query) {
+				$query->orderBy('created_at', 'desc');
+			}, 'notificationsReceived.actor']);
 		});
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
@@ -71,6 +74,8 @@ Route::middleware('localization')->group(function () {
 		Route::post('/comment', [CommentController::class, 'store']);
 		Route::post('/like', [LikeController::class, 'store']);
 		Route::delete('/like/{like}', [LikeController::class, 'destroy']);
+
+		Route::post('/notifications', [NotificationController::class, 'store']);
 	});
 	Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
 	Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');

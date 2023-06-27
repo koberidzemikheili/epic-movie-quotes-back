@@ -40,7 +40,7 @@ class QuoteController extends Controller
 
 	public function index($id)
 	{
-		$quote = Quote::with('likes', 'comments')->find($id);
+		$quote = Quote::with('comments.user', 'likes', 'user', 'movie')->find($id);
 
 		if (!$quote) {
 			return response()->json(['error' => 'Quote not found'], 404);
