@@ -9,13 +9,11 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\UserController;
 use App\Models\Genre;
 use App\Models\Movie;
-use App\Models\Quote;
 use App\Models\User;
 
 /*
@@ -39,13 +37,10 @@ Route::middleware('localization')->group(function () {
 
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
 	Route::middleware('auth:sanctum')->group(function () {
-		Route::get('/user', function (Request $request) {
-			return $request->user()->load(['notificationsReceived' => function ($query) {
-				$query->orderBy('created_at', 'desc');
-			}, 'notificationsReceived.actor']);
-		});
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);
+
+		Route::get('/user', [UserController::class, 'getAuthUserData']);
 		Route::get('/usermovies', [UserController::class, 'usermovies']);
 		Route::get('/user/{user}', function (User $user) {
 			return response()->json(['user' => $user], 201);
@@ -55,9 +50,7 @@ Route::middleware('localization')->group(function () {
 		Route::get('/quote/{quote}', [QuoteController::class, 'index']);
 		Route::put('/quote/{quote}', [QuoteController::class, 'update']);
 		Route::delete('/quote/{quote}', [QuoteController::class, 'destroy']);
-		Route::get('/quote', function () {
-			return response()->json(['quotes' => Quote::with(['comments.user', 'likes', 'user', 'movie'])->get()], 201);
-		});
+		Route::get('/quote', [QuoteController::class, 'getQuotes']);
 
 		Route::post('/movie', [MovieController::class, 'store']);
 		Route::get('/movie/{movie}', [MovieController::class, 'show']);

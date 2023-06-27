@@ -6,6 +6,7 @@ use App\Events\NewNotification;
 use App\Events\UserLikedQuote;
 use App\Models\Like;
 use App\Models\Notification;
+use App\Models\Quote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,18 +22,26 @@ class LikeController extends Controller
 
 			$like->save();
 
-			// Create the notification
-			$notification = new Notification();
-			$notification->actor_id = Auth::id(); // Assuming this should be the same as user_id from the like
-			$notification->receiver_id = $request->quote_userid; // You'll need to set this to the ID of the user to be notified
-			$notification->quote_id = $request->quote_id;
-			$notification->action = 'like'; // Assuming this is the correct action
+			// Check if the user is liking their own quote
+			if ($like->user_id != $request->quote_userid) {
+				// Create the notification
+				$notification = new Notification();
+				$notification->actor_id = Auth::id();
+				$notification->receiver_id = $request->quote_userid;
+				$notification->quote_id = $request->quote_id;
+				$notification->action = 'like';
 
-			$notification->save();
+				$notification->save();
 
-			// Fire the events
-			event(new UserLikedQuote($like));
-			event(new NewNotification($notification));
+				// Fire the NewNotification event
+				event(new NewNotification($notification));
+			}
+
+			// Now that the like is created, we get the updated quote.
+			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
+
+			// Fire the UserLikedQuote event
+			event(new UserLikedQuote($quote));
 
 			return ['message' => 'successful'];
 		});
@@ -40,10 +49,15 @@ class LikeController extends Controller
 		return response()->json($response, 201);
 	}
 
-	public function destroy(Like $Like)
-	{
-		event(new UserLikedQuote($Like));
-		$Like->delete();
-		return response()->json(['message' => 'deleted successfully'], 200);
-	}
+public function destroy(Like $like)
+{
+	$like->delete();
+
+	// Now that the like is deleted, we get the updated quote.
+	$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
+
+	event(new UserLikedQuote($quote));
+
+	return response()->json(['message' => 'deleted successfully'], 200);
+}
 }

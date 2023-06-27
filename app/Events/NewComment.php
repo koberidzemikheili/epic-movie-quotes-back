@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Quote;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -12,15 +13,20 @@ class NewComment implements ShouldBroadcast
 {
 	use Dispatchable, InteractsWithSockets, SerializesModels;
 
-	public $comment;
+	public $quote;
 
-	public function __construct($comment)
+	public function __construct(Quote $quote)
 	{
-		$this->comment = $comment;
+		$this->quote = $quote;
 	}
 
 	public function broadcastOn()
 	{
-		return new Channel('comments.' . $this->comment->quote_id);
+		return new Channel('comments.' . $this->quote->id);
+	}
+
+	public function broadcastWith()
+	{
+		return ['quote' => $this->quote];
 	}
 }

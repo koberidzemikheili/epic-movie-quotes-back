@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Quote;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -15,11 +16,11 @@ class UserLikedQuote implements ShouldBroadcast
 	/**
 	 * Create a new event instance.
 	 */
-	public $like;
+	public $quote;
 
-	public function __construct($like)
+	public function __construct(Quote $quote)
 	{
-		$this->like = $like;
+		$this->quote = $quote;
 	}
 
 	/**
@@ -32,5 +33,10 @@ class UserLikedQuote implements ShouldBroadcast
 		return [
 			new Channel('likes'),
 		];
+	}
+
+	public function broadcastWith()
+	{
+		return ['quote' => $this->quote];
 	}
 }

@@ -7,6 +7,7 @@ use App\Events\NewNotification;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Models\Comment;
 use App\Models\Notification;
+use App\Models\Quote;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -21,18 +22,28 @@ class CommentController extends Controller
 				'quote_id' => $request->quote_id,
 			]);
 
-			// Create the notification
-			$notification = new Notification;
-			$notification->actor_id = Auth::id(); // Assuming this should be the same as user_id from the comment
-			$notification->receiver_id = $request->quote_userid; // You'll need to set this to the ID of the user to be notified
-			$notification->quote_id = $request->quote_id;
-			$notification->action = 'comment'; // Assuming this is the correct action
+			// Fetch the quote
+			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])
+				->where('id', $request->quote_id)
+				->first();
 
-			$notification->save();
+			// Check if the user is commenting on their own quote
+			if ($comment->user_id != $request->quote_userid) {
+				// Create the notification
+				$notification = new Notification;
+				$notification->actor_id = Auth::id(); // Assuming this should be the same as user_id from the comment
+				$notification->receiver_id = $request->quote_userid; // You'll need to set this to the ID of the user to be notified
+				$notification->quote_id = $request->quote_id;
+				$notification->action = 'comment'; // Assuming this is the correct action
 
-			// Fire the events
-			event(new NewComment($comment));
-			event(new NewNotification($notification));
+				$notification->save();
+
+				// Fire the NewNotification event
+				event(new NewNotification($notification));
+			}
+
+			// Fire the NewComment event
+			event(new NewComment($quote));
 
 			return ['message' => 'successful'];
 		});

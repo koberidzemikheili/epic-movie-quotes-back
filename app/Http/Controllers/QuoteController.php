@@ -10,6 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
 {
+	public function getQuotes()
+	{
+		return response()->json([
+			'quotes' => Quote::with(['comments' => function ($query) {
+				$query->orderBy('created_at', 'desc');
+			}, 'comments.user', 'likes', 'user', 'movie'])
+			->orderBy('created_at', 'desc')
+			->paginate(5),
+		], 201);
+	}
+
 	public function store(StoreQuoteRequest $request)
 	{
 		Quote::create([
