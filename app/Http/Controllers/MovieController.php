@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Movie\StoreMovieRequest;
 use App\Http\Requests\Movie\UpdateMovieRequest;
+use App\Http\Resources\MovieResource;
 use App\Models\Movie;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,7 @@ class MovieController extends Controller
 	public function show(Movie $movie)
 	{
 		$movie->load(['genres', 'quotes.comments', 'quotes.likes']);
-		return response()->json($movie, 201);
+		return response()->json(['movie' => new MovieResource($movie)], 200);
 	}
 
 	public function store(StoreMovieRequest $request)

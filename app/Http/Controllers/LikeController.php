@@ -22,9 +22,7 @@ class LikeController extends Controller
 
 			$like->save();
 
-			// Check if the user is liking their own quote
 			if ($like->user_id != $request->quote_userid) {
-				// Create the notification
 				$notification = new Notification();
 				$notification->actor_id = Auth::id();
 				$notification->receiver_id = $request->quote_userid;
@@ -33,14 +31,11 @@ class LikeController extends Controller
 
 				$notification->save();
 
-				// Fire the NewNotification event
 				event(new NewNotification($notification));
 			}
 
-			// Now that the like is created, we get the updated quote.
 			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
 
-			// Fire the UserLikedQuote event
 			event(new UserLikedQuote($quote));
 
 			return ['message' => 'successful'];
@@ -53,7 +48,6 @@ public function destroy(Like $like)
 {
 	$like->delete();
 
-	// Now that the like is deleted, we get the updated quote.
 	$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
 
 	event(new UserLikedQuote($quote));

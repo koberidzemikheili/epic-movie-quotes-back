@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\GenreResource;
+use App\Http\Resources\MovieResource;
+use App\Http\Resources\UserResource;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\User;
@@ -43,7 +46,7 @@ Route::middleware('localization')->group(function () {
 		Route::get('/user', [UserController::class, 'getAuthUserData']);
 		Route::get('/usermovies', [UserController::class, 'usermovies']);
 		Route::get('/user/{user}', function (User $user) {
-			return response()->json(['user' => $user], 201);
+			return response()->json(['user' => new UserResource($user)], 200);
 		});
 
 		Route::post('/quote', [QuoteController::class, 'store']);
@@ -57,11 +60,11 @@ Route::middleware('localization')->group(function () {
 		Route::put('/movie/{movie}', [MovieController::class, 'update']);
 		Route::delete('/movie/{movie}', [MovieController::class, 'destroy']);
 		Route::get('/movie', function () {
-			return response()->json(['movies' => Movie::all()], 201);
+			return response()->json(['movies' => MovieResource::collection(Movie::all())], 200);
 		});
 
 		Route::get('/genres', function () {
-			return response()->json(['genres' => Genre::all()], 201);
+			return response()->json(['genres' => GenreResource::collection(Genre::all())], 200);
 		});
 
 		Route::post('/comment', [CommentController::class, 'store']);

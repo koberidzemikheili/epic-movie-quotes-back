@@ -58,14 +58,14 @@ class AuthController extends Controller
 		$googleuser = Socialite::driver('google')->user();
 		$user = User::updateOrCreate(
 			['email' => $googleuser->email],
-			['username' => $googleuser->name, 'email'=>$googleuser->email, 'google_id'=>$googleuser->id],
+			['username' => $googleuser->name, 'email'=>$googleuser->email, 'google_id'=>$googleuser->id, 'profile_pictures'=>'default_profile_picture.jpg'],
 		);
 		auth()->login($user);
 		$user->markEmailAsVerified();
 		session()->regenerate();
 		$csrfToken = Crypt::encrypt(csrf_token());
 		$laravelsession = Crypt::encrypt(session()->getId());
-		$response = redirect()->away('http://127.0.0.1:5173')->withCookie('XSRF-TOKEN', $csrfToken)->withCookie('laravel_session', $laravelsession);
+		$response = redirect()->away(env('FRONT_END_URL'))->withCookie('XSRF-TOKEN', $csrfToken)->withCookie('laravel_session', $laravelsession);
 		return $response;
 	}
 }
