@@ -16,6 +16,7 @@ return new class extends Migration {
 			$table->foreignId('receiver_id')->constrained('users');
 			$table->foreignId('quote_id')->constrained('quotes')->cascadeOnDelete();
 			$table->string('action');
+			$table->boolean('is_seen')->default(false);
 			$table->timestamps();
 		});
 	}
