@@ -26,8 +26,13 @@ class AuthController extends Controller
 
 	public function store(RegisterRequest $request)
 	{
-		$user = User::create($request->validated());
+		$validatedData = $request->validated();
+
+		$validatedData['profile_pictures'] = 'default_profile_picture.jpg';
+
+		$user = User::create($validatedData);
 		$user->sendEmailVerificationNotification();
+
 		return response()->json(['message' => 'User created'], 201);
 	}
 
