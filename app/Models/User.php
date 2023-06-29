@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
 		'email',
 		'password',
 		'google_id',
+		'profile_pictures',
 	];
 
 	/**
@@ -75,5 +76,15 @@ public function quotes()
 public function comments()
 {
 	return $this->hasMany(Comment::class);
+}
+
+public function notificationsReceived()
+{
+	return $this->hasMany(Notification::class, 'receiver_id');
+}
+
+public function notificationsSent()
+{
+	return $this->hasMany(Notification::class, 'actor_id');
 }
 }
