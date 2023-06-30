@@ -87,4 +87,9 @@ public function notificationsSent()
 {
 	return $this->hasMany(Notification::class, 'actor_id');
 }
+
+public function likes()
+{
+	return $this->belongsToMany(Quote::class);
+}
 }

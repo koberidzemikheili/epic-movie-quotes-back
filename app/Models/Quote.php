@@ -34,6 +34,6 @@ class Quote extends Model
 
 	public function likes()
 	{
-		return $this->hasMany(Like::class);
+		return $this->belongsToMany(User::class);
 	}
 }

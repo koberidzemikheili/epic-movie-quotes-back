@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Events\NewNotification;
 use App\Events\UserLikedQuote;
-use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Quote;
 use Illuminate\Http\Request;
@@ -16,13 +15,10 @@ class LikeController extends Controller
 	public function store(Request $request)
 	{
 		$response = DB::transaction(function () use ($request) {
-			$like = new Like();
-			$like->user_id = Auth::id();
-			$like->quote_id = $request->quote_id;
+			$quote = Quote::find($request->quote_id);
+			$quote->likes()->attach(Auth::id());
 
-			$like->save();
-
-			if ($like->user_id != $request->quote_userid) {
+			if (Auth::id() != $request->quote_userid) {
 				$notification = new Notification();
 				$notification->actor_id = Auth::id();
 				$notification->receiver_id = $request->quote_userid;
@@ -34,7 +30,7 @@ class LikeController extends Controller
 				event(new NewNotification($notification));
 			}
 
-			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
+			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($request->quote_id);
 
 			event(new UserLikedQuote($quote));
 
@@ -44,14 +40,19 @@ class LikeController extends Controller
 		return response()->json($response, 201);
 	}
 
-public function destroy(Like $like)
+public function destroy(Request $request)
 {
-	$like->delete();
+	$response = DB::transaction(function () use ($request) {
+		$quote = Quote::find($request->quote_id);
+		$quote->likes()->detach(Auth::id());
 
-	$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
+		$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($request->quote_id);
 
-	event(new UserLikedQuote($quote));
+		event(new UserLikedQuote($quote));
 
-	return response()->json(['message' => 'deleted successfully'], 200);
+		return ['message' => 'deleted successfully'];
+	});
+
+	return response()->json($response, 200);
 }
 }

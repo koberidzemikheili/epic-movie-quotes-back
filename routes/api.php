@@ -69,7 +69,7 @@ Route::middleware('localization')->group(function () {
 
 		Route::post('/comment', [CommentController::class, 'store']);
 		Route::post('/like', [LikeController::class, 'store']);
-		Route::delete('/like/{like}', [LikeController::class, 'destroy']);
+		Route::delete('/like', [LikeController::class, 'destroy']);
 
 		Route::post('/notifications', [NotificationController::class, 'store']);
 		Route::post('/notifications/{id}', [NotificationController::class, 'markAsSeen']);
