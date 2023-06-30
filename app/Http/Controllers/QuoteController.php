@@ -8,19 +8,44 @@ use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class QuoteController extends Controller
 {
-	public function getQuotes()
+	public function getQuotes(Request $request)
 	{
-		$quotes = Quote::with(['comments' => function ($query) {
+		$search = $request->get('searchBy');
+		$query = Quote::query();
+
+		if ($search) {
+			if ($search[0] === '#') {
+				$search = ltrim($search, '#');
+				$query->where('title->en', 'like', '%' . $search . '%')
+					  ->orWhere('title->ka', 'like', '%' . $search . '%');
+			} elseif ($search[0] === '@') {
+				$search = ltrim($search, '@');
+				$query->whereHas('movie', function ($query) use ($search) {
+					$query->where('name->en', 'like', '%' . $search . '%')
+						  ->orWhere('name->ka', 'like', '%' . $search . '%');
+				});
+			} else {
+				$query->where('title->en', 'like', '%' . $search . '%')
+					  ->orWhere('title->ka', 'like', '%' . $search . '%')
+					  ->orWhereHas('movie', function ($query) use ($search) {
+					  	$query->where('name->en', 'like', '%' . $search . '%')
+					  		->orWhere('name->ka', 'like', '%' . $search . '%');
+					  });
+			}
+		}
+
+		$quotes = $query->with(['comments' => function ($query) {
 			$query->orderBy('created_at', 'desc');
 		}, 'comments.user', 'likes', 'user', 'movie'])
 		->orderBy('created_at', 'desc')
 		->paginate(5);
 
 		return response()->json([
-			'quotes' => QuoteResource::collection($quotes),
+			'quotes' => $quotes,
 		], 200);
 	}
 
