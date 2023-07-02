@@ -36,4 +36,9 @@ class Quote extends Model
 	{
 		return $this->belongsToMany(User::class);
 	}
+
+	public function notifications()
+	{
+		return $this->morphMany(Notification::class, 'notifiable');
+	}
 }

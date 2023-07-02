@@ -6,6 +6,7 @@ use App\Events\NewNotification;
 use App\Events\UserLikedQuote;
 use App\Models\Notification;
 use App\Models\Quote;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +21,10 @@ class LikeController extends Controller
 
 			if (Auth::id() != $request->quote_userid) {
 				$notification = new Notification();
-				$notification->actor_id = Auth::id();
-				$notification->receiver_id = $request->quote_userid;
-				$notification->quote_id = $request->quote_id;
 				$notification->action = 'like';
+				$notification->notifiable()->associate(Quote::find($request->quote_id));
+				$notification->actor()->associate(Auth::user());
+				$notification->receiver()->associate(User::find($request->quote_userid));
 
 				$notification->save();
 

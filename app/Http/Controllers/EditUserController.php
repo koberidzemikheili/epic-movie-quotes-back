@@ -18,12 +18,14 @@ class EditUserController extends Controller
 				$attributes['profile_picture'] = request()->file('profile_picture')->store('profile_pictures');
 				$user->profile_pictures = $attributes['profile_picture'];
 			}
-			if (request()->has('email')) {
-				$user->email = $attributes['email'];
-				$user->email_verified_at = null;
+
+			if (request()->has('email') && $attributes['email'] !== $user->email) {
+				$user->new_email = $attributes['email'];
 				$user->save();
-				$user->sendEmailVerificationNotification();
+				$user->sendNewEmailVerificationNotification();
+				unset($attributes['email']);
 			}
+
 			$user->update($attributes);
 		}
 

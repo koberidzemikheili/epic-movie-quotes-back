@@ -23,7 +23,7 @@ class UserController extends Controller
 			'notificationsReceived' => function ($query) {
 				$query->orderBy('created_at', 'desc');
 			},
-			'notificationsReceived.actor',
+			'notificationsReceived.actor', 'notificationsReceived.notifiable',
 		]);
 
 		return response()->json(['user' => new UserResource($user)], 200);

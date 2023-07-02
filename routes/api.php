@@ -39,6 +39,7 @@ Route::middleware('localization')->group(function () {
 	Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
+	Route::get('/verify-new-email/{id}/{hash}', [VerificationController::class, 'verifyNewEmail'])->middleware(['signed'])->name('verification.verify.new.email');
 	Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::post('/edit', [EditUserController::class, 'update']);

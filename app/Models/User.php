@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\CustomVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\CustomResetPasswordNotification;
+use App\Notifications\CustomVerifyNewEmail;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -63,6 +64,21 @@ class User extends Authenticatable implements MustVerifyEmail
 		$this->notify(new CustomResetPasswordNotification($url));
 	}
 
+	public function sendNewEmailVerificationNotification()
+	{
+		$this->notify(new CustomVerifyNewEmail);
+	}
+
+	public function markNewEmailAsVerified(): void
+	{
+		if ($this->new_email) {
+			$this->email = $this->new_email;
+			$this->new_email = null;
+			$this->email_verified_at = now();
+			$this->save();
+		}
+	}
+
 	public function movies()
 	{
 		return $this->hasMany(Movie::class);
@@ -80,12 +96,12 @@ public function comments()
 
 public function notificationsReceived()
 {
-	return $this->hasMany(Notification::class, 'receiver_id');
+	return $this->morphMany(Notification::class, 'receiver');
 }
 
 public function notificationsSent()
 {
-	return $this->hasMany(Notification::class, 'actor_id');
+	return $this->morphMany(Notification::class, 'actor');
 }
 
 public function likes()

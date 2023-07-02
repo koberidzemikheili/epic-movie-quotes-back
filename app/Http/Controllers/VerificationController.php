@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomEmailVerificationRequest;
+use App\Http\Requests\CustomNewEmailVerificationRequest;
 
 class VerificationController extends Controller
 {
@@ -10,6 +11,13 @@ class VerificationController extends Controller
 	{
 		$request->fulfill();
 
-		return redirect(env('FRONT_URL') . 'verified-successfully');
+		return redirect(env('FRONT_END_URL') . '/verified-successfully');
+	}
+
+	public function verifyNewEmail(CustomNewEmailVerificationRequest $request)
+	{
+		$request->fulfill();
+
+		return redirect(env('FRONT_END_URL') . '/profile-page');
 	}
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Quote;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -27,11 +28,11 @@ class CommentController extends Controller
 				->first();
 
 			if ($comment->user_id != $request->quote_userid) {
-				$notification = new Notification;
-				$notification->actor_id = Auth::id();
-				$notification->receiver_id = $request->quote_userid;
-				$notification->quote_id = $request->quote_id;
+				$notification = new Notification();
 				$notification->action = 'comment';
+				$notification->notifiable()->associate(Quote::find($request->quote_id));
+				$notification->actor()->associate(Auth::user());
+				$notification->receiver()->associate(User::find($request->quote_userid));
 
 				$notification->save();
 
