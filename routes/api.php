@@ -40,7 +40,7 @@ Route::middleware('localization')->group(function () {
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
 	Route::get('/verify-new-email/{id}/{hash}', [VerificationController::class, 'verifyNewEmail'])->middleware(['signed'])->name('verification.verify.new.email');
 
-	Route::middleware('auth:sanctum')->group(function () {
+	Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
 		Route::put('/edit', [UserController::class, 'update']);
 
