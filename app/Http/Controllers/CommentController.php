@@ -9,12 +9,13 @@ use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Quote;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
-	public function store(StoreCommentRequest $request)
+	public function store(StoreCommentRequest $request): JsonResponse
 	{
 		$response = DB::transaction(function () use ($request) {
 			$comment = Comment::create([

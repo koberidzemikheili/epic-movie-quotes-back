@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-	public function markAsSeen($id)
+	public function markAsSeen($id): JsonResponse
 	{
 		$notification = Notification::find($id);
 
@@ -21,7 +22,7 @@ class NotificationController extends Controller
 		return response()->json(['message' => 'Notification marked as seen']);
 	}
 
-	public function markAllAsSeen(Request $request)
+	public function markAllAsSeen(Request $request): JsonResponse
 	{
 		$userId = $request->input('userId');
 		Notification::where('receiver_id', $userId)->update(['is_seen' => true]);

@@ -6,18 +6,19 @@ use App\Http\Requests\Movie\StoreMovieRequest;
 use App\Http\Requests\Movie\UpdateMovieRequest;
 use App\Http\Resources\MovieResource;
 use App\Models\Movie;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
 {
-	public function show(Movie $movie)
+	public function show(Movie $movie): JsonResponse
 	{
 		$movie->load(['genres', 'quotes.comments', 'quotes.likes']);
 		return response()->json(['movie' => new MovieResource($movie)], 200);
 	}
 
-	public function store(StoreMovieRequest $request)
+	public function store(StoreMovieRequest $request): JsonResponse
 	{
 		$movie = Movie::create([
 			'name'        => ['en' => $request->name['en'], 'ka' => $request->name['ka']],
@@ -33,7 +34,7 @@ class MovieController extends Controller
 		return response()->json(['message' => 'success'], 201);
 	}
 
-	public function update(UpdateMovieRequest $request, Movie $movie)
+	public function update(UpdateMovieRequest $request, Movie $movie): JsonResponse
 	{
 		if ($request->hasFile('movie_image')) {
 			Storage::delete($movie->movie_image);
@@ -60,7 +61,7 @@ class MovieController extends Controller
 		return response()->json(['message' => 'success'], 200);
 	}
 
-public function destroy(Movie $Movie)
+public function destroy(Movie $Movie): JsonResponse
 {
 	$Movie->delete();
 

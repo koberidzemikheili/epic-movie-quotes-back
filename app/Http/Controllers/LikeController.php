@@ -7,13 +7,14 @@ use App\Events\UserLikedQuote;
 use App\Models\Notification;
 use App\Models\Quote;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class LikeController extends Controller
 {
-	public function store(Request $request)
+	public function store(Request $request): JsonResponse
 	{
 		$response = DB::transaction(function () use ($request) {
 			$quote = Quote::find($request->quote_id);
@@ -31,8 +32,6 @@ class LikeController extends Controller
 				event(new NewNotification($notification));
 			}
 
-			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($request->quote_id);
-
 			event(new UserLikedQuote($quote));
 
 			return ['message' => 'successful'];
@@ -41,13 +40,11 @@ class LikeController extends Controller
 		return response()->json($response, 201);
 	}
 
-public function destroy(Request $request)
+public function destroy(Request $request): JsonResponse
 {
 	$response = DB::transaction(function () use ($request) {
 		$quote = Quote::find($request->quote_id);
 		$quote->likes()->detach(Auth::id());
-
-		$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($request->quote_id);
 
 		event(new UserLikedQuote($quote));
 

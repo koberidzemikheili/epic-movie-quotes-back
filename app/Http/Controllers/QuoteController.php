@@ -6,6 +6,7 @@ use App\Http\Requests\Quote\StoreQuoteRequest;
 use App\Http\Requests\Quote\UpdateQuoteRequest;
 use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -44,14 +45,14 @@ class QuoteController extends Controller
 		->orderBy('created_at', 'desc')
 		->paginate(5);
 
-		return response()->json([
-			'quotes' => $quotes,
-		], 200);
+		return QuoteResource::collection($quotes);
 	}
 
-	public function index($id)
+	public function index($id): JsonResponse
 	{
-		$quote = Quote::with('comments.user', 'likes', 'user', 'movie')->find($id);
+		$quote = Quote::with(['comments' => function ($query) {
+			$query->orderBy('created_at', 'desc');
+		}, 'comments.user', 'likes', 'user', 'movie'])->find($id);
 
 		if (!$quote) {
 			return response()->json(['error' => 'Quote not found'], 404);
@@ -60,7 +61,7 @@ class QuoteController extends Controller
 		return response()->json(['quote' => new QuoteResource($quote)]);
 	}
 
-	public function store(StoreQuoteRequest $request)
+	public function store(StoreQuoteRequest $request): JsonResponse
 	{
 		Quote::create([
 			'title'       => $request->title,
@@ -72,7 +73,7 @@ class QuoteController extends Controller
 		return response()->json(['message' => 'Quote created successfully'], 201);
 	}
 
-	public function update(UpdateQuoteRequest $request, Quote $quote)
+	public function update(UpdateQuoteRequest $request, Quote $quote): JsonResponse
 	{
 		if ($request->hasFile('quote_image')) {
 			Storage::delete($quote->quote_image);
@@ -88,7 +89,7 @@ class QuoteController extends Controller
 		return response()->json(['message' => 'success'], 200);
 	}
 
-	public function destroy(Quote $quote)
+	public function destroy(Quote $quote): JsonResponse
 	{
 		$quote->delete();
 

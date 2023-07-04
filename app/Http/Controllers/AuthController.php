@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Requests\Register\RegisterRequest;
 use App\Http\Requests\Login\LoginRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -12,7 +14,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-	public function login(LoginRequest $request)
+	public function login(LoginRequest $request): JsonResponse
 	{
 		$credentials = $request->only(['login', 'password']);
 		$field = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -24,7 +26,7 @@ class AuthController extends Controller
 		return response()->json(['message' => trans('validation.login')], 401);
 	}
 
-	public function store(RegisterRequest $request)
+	public function store(RegisterRequest $request): JsonResponse
 	{
 		$validatedData = $request->validated();
 
@@ -36,7 +38,7 @@ class AuthController extends Controller
 		return response()->json(['message' => 'User created'], 201);
 	}
 
-	public function logout(Request $request)
+	public function logout(Request $request): JsonResponse
 	{
 		Auth::guard('web')->logout();
 
@@ -48,12 +50,12 @@ class AuthController extends Controller
 		], 201);
 	}
 
-	public function redirect()
+	public function redirect(): RedirectResponse
 	{
 		return Socialite::driver('google')->redirect();
 	}
 
-	public function callback()
+	public function callback(): RedirectResponse
 	{
 		$googleuser = Socialite::driver('google')->user();
 		$user = User::updateOrCreate(

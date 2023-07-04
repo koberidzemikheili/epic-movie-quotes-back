@@ -60,7 +60,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
 	public function sendPasswordResetNotification($token): void
 	{
-		$url = 'http://localhost:5173/new-password?token=' . $token . '&email=';
+		$url = env('FRONT_END_URL') . '/new-password?token=' . $token . '&email=';
 		$this->notify(new CustomResetPasswordNotification($url));
 	}
 
@@ -106,6 +106,6 @@ public function notificationsSent()
 
 public function likes()
 {
-	return $this->belongsToMany(Quote::class);
+	return $this->belongsToMany(Quote::class)->withPivot('id', 'user_id', 'quote_id');
 }
 }
