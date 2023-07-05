@@ -22,7 +22,7 @@ class Quote extends Model
 		return $this->belongsTo(Movie::class);
 	}
 
-	public function user()
+	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
 	}
@@ -34,6 +34,11 @@ class Quote extends Model
 
 	public function likes()
 	{
-		return $this->hasMany(Like::class);
+		return $this->belongsToMany(User::class)->withPivot('id', 'user_id', 'quote_id');
+	}
+
+	public function notifications()
+	{
+		return $this->morphMany(Notification::class, 'notifiable');
 	}
 }

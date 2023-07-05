@@ -11,16 +11,16 @@ class Notification extends Model
 
 	public function actor()
 	{
-		return $this->belongsTo(User::class, 'actor_id');
+		return $this->morphTo();
 	}
 
 	public function receiver()
 	{
-		return $this->belongsTo(User::class, 'receiver_id');
+		return $this->morphTo();
 	}
 
-	public function quote()
+	public function notifiable()
 	{
-		return $this->belongsTo(Quote::class);
+		return $this->morphTo();
 	}
 }

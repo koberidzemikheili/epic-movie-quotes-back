@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\EditUserController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LocalizeController;
 use App\Http\Controllers\MovieController;
@@ -39,9 +38,11 @@ Route::middleware('localization')->group(function () {
 	Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
-	Route::middleware('auth:sanctum')->group(function () {
+	Route::get('/verify-new-email/{id}/{hash}', [VerificationController::class, 'verifyNewEmail'])->middleware(['signed'])->name('verification.verify.new.email');
+
+	Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
-		Route::post('/edit', [EditUserController::class, 'update']);
+		Route::put('/edit', [UserController::class, 'update']);
 
 		Route::get('/user', [UserController::class, 'getAuthUserData']);
 		Route::get('/usermovies', [UserController::class, 'usermovies']);
@@ -49,27 +50,30 @@ Route::middleware('localization')->group(function () {
 			return response()->json(['user' => new UserResource($user)], 200);
 		});
 
-		Route::post('/quote', [QuoteController::class, 'store']);
-		Route::get('/quote/{quote}', [QuoteController::class, 'index']);
-		Route::put('/quote/{quote}', [QuoteController::class, 'update']);
-		Route::delete('/quote/{quote}', [QuoteController::class, 'destroy']);
-		Route::get('/quote', [QuoteController::class, 'getQuotes']);
+		Route::prefix('quote')->group(function () {
+			Route::post('/', [QuoteController::class, 'store']);
+			Route::get('/{quote}', [QuoteController::class, 'index']);
+			Route::put('/{quote}', [QuoteController::class, 'update']);
+			Route::delete('/{quote}', [QuoteController::class, 'destroy']);
+			Route::get('/', [QuoteController::class, 'getQuotes']);
+		});
 
-		Route::post('/movie', [MovieController::class, 'store']);
-		Route::get('/movie/{movie}', [MovieController::class, 'show']);
-		Route::put('/movie/{movie}', [MovieController::class, 'update']);
-		Route::delete('/movie/{movie}', [MovieController::class, 'destroy']);
-		Route::get('/movie', function () {
-			return response()->json(['movies' => MovieResource::collection(Movie::all())], 200);
+		Route::prefix('movie')->group(function () {
+			Route::post('/', [MovieController::class, 'store']);
+			Route::get('/{movie}', [MovieController::class, 'show']);
+			Route::put('/{movie}', [MovieController::class, 'update']);
+			Route::delete('/{movie}', [MovieController::class, 'destroy']);
+			Route::get('/', function () {
+				return response()->json(['movies' => MovieResource::collection(Movie::all())], 200);
+			});
 		});
 
 		Route::get('/genres', function () {
 			return response()->json(['genres' => GenreResource::collection(Genre::all())], 200);
 		});
-
 		Route::post('/comment', [CommentController::class, 'store']);
 		Route::post('/like', [LikeController::class, 'store']);
-		Route::delete('/like/{like}', [LikeController::class, 'destroy']);
+		Route::delete('/like', [LikeController::class, 'destroy']);
 
 		Route::post('/notifications', [NotificationController::class, 'store']);
 		Route::post('/notifications/{id}', [NotificationController::class, 'markAsSeen']);

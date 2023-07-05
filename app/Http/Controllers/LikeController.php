@@ -4,37 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Events\NewNotification;
 use App\Events\UserLikedQuote;
-use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Quote;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class LikeController extends Controller
 {
-	public function store(Request $request)
+	public function store(Request $request): JsonResponse
 	{
 		$response = DB::transaction(function () use ($request) {
-			$like = new Like();
-			$like->user_id = Auth::id();
-			$like->quote_id = $request->quote_id;
+			$quote = Quote::find($request->quote_id);
+			$quote->likes()->attach(Auth::id());
 
-			$like->save();
-
-			if ($like->user_id != $request->quote_userid) {
+			if (Auth::id() != $request->quote_userid) {
 				$notification = new Notification();
-				$notification->actor_id = Auth::id();
-				$notification->receiver_id = $request->quote_userid;
-				$notification->quote_id = $request->quote_id;
 				$notification->action = 'like';
+				$notification->notifiable()->associate(Quote::find($request->quote_id));
+				$notification->actor()->associate(Auth::user());
+				$notification->receiver()->associate(User::find($request->quote_userid));
 
 				$notification->save();
 
 				event(new NewNotification($notification));
 			}
-
-			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
 
 			event(new UserLikedQuote($quote));
 
@@ -44,14 +40,17 @@ class LikeController extends Controller
 		return response()->json($response, 201);
 	}
 
-public function destroy(Like $like)
+public function destroy(Request $request): JsonResponse
 {
-	$like->delete();
+	$response = DB::transaction(function () use ($request) {
+		$quote = Quote::find($request->quote_id);
+		$quote->likes()->detach(Auth::id());
 
-	$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])->find($like->quote_id);
+		event(new UserLikedQuote($quote));
 
-	event(new UserLikedQuote($quote));
+		return ['message' => 'deleted successfully'];
+	});
 
-	return response()->json(['message' => 'deleted successfully'], 200);
+	return response()->json($response, 200);
 }
 }

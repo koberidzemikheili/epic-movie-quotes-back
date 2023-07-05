@@ -11,7 +11,7 @@
 <body style="margin: 0; padding: 0; background-color: #11101a;">
     <div style="max-width: 600px; margin: 0 auto; text-align: left; padding: 20px;">
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.ibb.co/K2xVn3t/Landing-Worldwide-2.png"
+            <img src="https://i.ibb.co/Rp6fLcd/bi-chat-quote-fill.png"
                 style="width: 30%; max-width: 50px; vertical-align: middle;">
         </div>
         <div style="text-align: left;">

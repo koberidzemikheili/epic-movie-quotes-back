@@ -12,9 +12,9 @@ return new class extends Migration {
 	{
 		Schema::create('notifications', function (Blueprint $table) {
 			$table->id();
-			$table->foreignId('actor_id')->constrained('users');
-			$table->foreignId('receiver_id')->constrained('users');
-			$table->foreignId('quote_id')->constrained('quotes')->cascadeOnDelete();
+			$table->morphs('actor');
+			$table->morphs('receiver');
+			$table->morphs('notifiable');
 			$table->string('action');
 			$table->boolean('is_seen')->default(false);
 			$table->timestamps();

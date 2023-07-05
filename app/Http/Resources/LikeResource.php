@@ -15,10 +15,9 @@ class LikeResource extends JsonResource
 	public function toArray(Request $request): array
 	{
 		return [
-			'id'         => $this->id,
-			'quote_id'   => $this->quote_id,
-			'user_id'    => $this->user_id,
-			'created_at' => $this->created_at,
+			'id'         => $this->pivot->id,
+			'quote_id'   => $this->pivot->quote_id,
+			'user_id'    => $this->pivot->user_id,
 		];
 	}
 }
