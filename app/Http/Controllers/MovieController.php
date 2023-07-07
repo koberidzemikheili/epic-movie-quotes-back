@@ -36,6 +36,8 @@ class MovieController extends Controller
 
 	public function update(UpdateMovieRequest $request, Movie $movie): JsonResponse
 	{
+		$this->authorize('update', $movie);
+
 		if ($request->hasFile('movie_image')) {
 			Storage::delete($movie->movie_image);
 			$movie->movie_image = $request->file('movie_image')->store('movie_images');
@@ -63,6 +65,8 @@ class MovieController extends Controller
 
 public function destroy(Movie $Movie): JsonResponse
 {
+	$this->authorize('delete', $Movie);
+
 	$Movie->delete();
 
 	return response()->json(['message' => 'success'], 201);

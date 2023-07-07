@@ -75,6 +75,8 @@ class QuoteController extends Controller
 
 	public function update(UpdateQuoteRequest $request, Quote $quote): JsonResponse
 	{
+		$this->authorize('update', $quote);
+
 		if ($request->hasFile('quote_image')) {
 			Storage::delete($quote->quote_image);
 			$quote->quote_image = $request->file('quote_image')->store('quote_images');
@@ -91,6 +93,7 @@ class QuoteController extends Controller
 
 	public function destroy(Quote $quote): JsonResponse
 	{
+		$this->authorize('delete', $quote);
 		$quote->delete();
 
 		return response()->json(['message' => 'success'], 201);
