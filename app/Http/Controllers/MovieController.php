@@ -8,6 +8,7 @@ use App\Http\Resources\MovieResource;
 use App\Models\Movie;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
@@ -20,17 +21,15 @@ class MovieController extends Controller
 
 	public function store(StoreMovieRequest $request): JsonResponse
 	{
-		$movie = Movie::create([
-			'name'        => ['en' => $request->name['en'], 'ka' => $request->name['ka']],
-			'year'        => $request->year,
-			'director'    => ['en' => $request->director['en'], 'ka' => $request->director['ka']],
-			'description' => ['en' => $request->description['en'], 'ka' => $request->description['ka']],
+		$validated = $request->validated();
+
+		$data = array_merge($validated, [
 			'user_id'     => Auth::id(),
 			'movie_image' => $request->file('movie_image')->store('movie_images'),
 		]);
 
-		$movie->genres()->attach($request->genres);
-
+		$movie = Movie::create($data);
+		$movie->genres()->attach($validated['genres']);
 		return response()->json(['message' => 'success'], 201);
 	}
 
@@ -38,24 +37,23 @@ class MovieController extends Controller
 	{
 		$this->authorize('update', $movie);
 
+		$validated = $request->validated();
+
 		if ($request->hasFile('movie_image')) {
 			Storage::delete($movie->movie_image);
-			$movie->movie_image = $request->file('movie_image')->store('movie_images');
+			$validated['movie_image'] = $request->file('movie_image')->store('movie_images');
 		}
 
-		$movie->update([
-			'name'        => ['en' => $request->name['en'], 'ka' => $request->name['ka']],
-			'year'        => $request->year,
-			'director'    => ['en' => $request->director['en'], 'ka' => $request->director['ka']],
-			'description' => ['en' => $request->description['en'], 'ka' => $request->description['ka']],
-			'user_id'     => Auth::id(),
-			'movie_image' => $movie->movie_image,
-		]);
+		$validated['user_id'] = Auth::id();
+
+		Log::info($validated);
+
+		$movie->update($validated);
 
 		if ($request->has('genres')) {
 			$genreIds = array_map(function ($genre) {
 				return $genre['id'];
-			}, $request->genres);
+			}, $validated['genres']);
 
 			$movie->genres()->sync($genreIds);
 		}

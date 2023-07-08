@@ -8,8 +8,9 @@ use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
 {
@@ -63,12 +64,14 @@ class QuoteController extends Controller
 
 	public function store(StoreQuoteRequest $request): JsonResponse
 	{
-		Quote::create([
-			'title'       => $request->title,
-			'movie_id'    => $request->movie_id,
-			'quote_image' => $request->file('quote_image')->store('quote_images'),
+		$validated = $request->validated();
+
+		$data = array_merge($validated, [
 			'user_id'     => Auth::id(),
+			'quote_image' => $request->file('quote_image')->store('quote_images'),
 		]);
+
+		Quote::create($data);
 
 		return response()->json(['message' => 'Quote created successfully'], 201);
 	}
@@ -77,16 +80,20 @@ class QuoteController extends Controller
 	{
 		$this->authorize('update', $quote);
 
+		$validated = $request->validated();
+
 		if ($request->hasFile('quote_image')) {
 			Storage::delete($quote->quote_image);
-			$quote->quote_image = $request->file('quote_image')->store('quote_images');
+			$validated['quote_image'] = $request->file('quote_image')->store('quote_images');
+		} else {
+			unset($validated['quote_image']);
 		}
 
-		$quote->update([
-			'title'       => ['en' => $request->title['en'], 'ka' => $request->title['ka']],
-			'user_id'     => Auth::id(),
-			'quote_image' => $quote->quote_image,
-		]);
+		$validated['user_id'] = Auth::id();
+
+		Log::info($validated);
+
+		$quote->update($validated);
 
 		return response()->json(['message' => 'success'], 200);
 	}

@@ -18,22 +18,23 @@ class CommentController extends Controller
 	public function store(StoreCommentRequest $request): JsonResponse
 	{
 		$response = DB::transaction(function () use ($request) {
+			$validated = $request->validated();
 			$comment = Comment::create([
-				'comment'  => $request->comment,
+				'comment'  => $validated['comment'],
 				'user_id'  => Auth::id(),
-				'quote_id' => $request->quote_id,
+				'quote_id' => $validated['quote_id'],
 			]);
 
 			$quote = Quote::with(['comments.user', 'likes', 'user', 'movie'])
-				->where('id', $request->quote_id)
+				->where('id', $validated['quote_id'])
 				->first();
 
-			if ($comment->user_id != $request->quote_userid) {
+			if ($comment->user_id != $validated['quote_userid']) {
 				$notification = new Notification();
 				$notification->action = 'comment';
-				$notification->notifiable()->associate(Quote::find($request->quote_id));
+				$notification->notifiable()->associate(Quote::find($validated['quote_id']));
 				$notification->actor()->associate(Auth::user());
-				$notification->receiver()->associate(User::find($request->quote_userid));
+				$notification->receiver()->associate(User::find($validated['quote_userid']));
 
 				$notification->save();
 
