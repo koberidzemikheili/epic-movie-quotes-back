@@ -15,7 +15,7 @@ class QuoteController extends Controller
 {
 	public function getQuotes(Request $request)
 	{
-		$search = $request->get('searchBy');
+		$search = $request->searchBy;
 		$query = Quote::query();
 
 		if ($search) {
