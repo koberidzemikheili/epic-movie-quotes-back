@@ -52,7 +52,7 @@ Route::middleware('localization')->group(function () {
 
 		Route::prefix('quote')->group(function () {
 			Route::post('/', [QuoteController::class, 'store']);
-			Route::get('/{quote}', [QuoteController::class, 'index']);
+			Route::get('/{quote}', [QuoteController::class, 'show']);
 			Route::put('/{quote}', [QuoteController::class, 'update']);
 			Route::delete('/{quote}', [QuoteController::class, 'destroy']);
 			Route::get('/', [QuoteController::class, 'getQuotes']);

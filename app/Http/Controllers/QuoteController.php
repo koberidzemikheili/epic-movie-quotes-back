@@ -48,11 +48,11 @@ class QuoteController extends Controller
 		return QuoteResource::collection($quotes);
 	}
 
-	public function index($id): JsonResponse
+	public function show(Quote $quote): JsonResponse
 	{
-		$quote = Quote::with(['comments' => function ($query) {
+		$quote->load(['comments' => function ($query) {
 			$query->orderBy('created_at', 'desc');
-		}, 'comments.user', 'likes', 'user', 'movie'])->find($id);
+		}, 'comments.user', 'likes', 'user', 'movie']);
 
 		if (!$quote) {
 			return response()->json(['error' => 'Quote not found'], 404);
