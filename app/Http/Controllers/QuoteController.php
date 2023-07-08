@@ -10,10 +10,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class QuoteController extends Controller
 {
-	public function getQuotes(Request $request)
+	public function getQuotes(Request $request): AnonymousResourceCollection
 	{
 		$search = $request->searchBy;
 		$query = Quote::query();
