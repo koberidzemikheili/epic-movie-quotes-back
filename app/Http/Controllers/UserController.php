@@ -8,15 +8,21 @@ use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\EditUser\EditUserRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
-	public function usermovies(): JsonResponse
+	public function userMovies(): JsonResponse
 	{
 		$user = Auth::user();
 		$movies = Movie::where('user_id', $user->id)->with('genres', 'quotes')->get();
 		return response()->json(['movies' => MovieResource::collection($movies)], 200);
+	}
+
+	public function showUser(User $user)
+	{
+		return response()->json(['user' => new UserResource($user)], 200);
 	}
 
 	public function getAuthUserData(Request $request): JsonResponse

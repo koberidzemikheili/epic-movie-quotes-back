@@ -18,6 +18,12 @@ class MovieController extends Controller
 		return response()->json(['movie' => new MovieResource($movie)], 200);
 	}
 
+	public function index()
+	{
+		$movies = Movie::all();
+		return response()->json(['movies' => MovieResource::collection($movies)], 200);
+	}
+
 	public function store(StoreMovieRequest $request): JsonResponse
 	{
 		$validated = $request->validated();
