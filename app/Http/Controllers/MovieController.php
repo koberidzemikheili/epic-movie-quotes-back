@@ -8,7 +8,6 @@ use App\Http\Resources\MovieResource;
 use App\Models\Movie;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MovieController extends Controller
@@ -45,8 +44,6 @@ class MovieController extends Controller
 		}
 
 		$validated['user_id'] = Auth::id();
-
-		Log::info($validated);
 
 		$movie->update($validated);
 

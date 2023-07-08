@@ -9,7 +9,6 @@ use App\Models\Quote;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
@@ -90,8 +89,6 @@ class QuoteController extends Controller
 		}
 
 		$validated['user_id'] = Auth::id();
-
-		Log::info($validated);
 
 		$quote->update($validated);
 

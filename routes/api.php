@@ -76,8 +76,8 @@ Route::middleware('localization')->group(function () {
 		Route::delete('/like', [LikeController::class, 'destroy']);
 
 		Route::post('/notifications', [NotificationController::class, 'store']);
-		Route::post('/notifications/{id}', [NotificationController::class, 'markAsSeen']);
-		Route::post('/notifications-mark-all-as-seen', [NotificationController::class, 'markAllAsSeen']);
+		Route::post('/notifications/{notification}/mark-as-seen', [NotificationController::class, 'markAsSeen']);
+		Route::post('/notifications/mark-all-as-seen', [NotificationController::class, 'markAllAsSeen']);
 	});
 	Route::get('/auth/redirect', [AuthController::class, 'redirect'])->middleware('web');
 	Route::get('/auth/callback', [AuthController::class, 'callback'])->middleware('web');
