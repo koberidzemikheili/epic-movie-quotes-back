@@ -29,7 +29,6 @@ Route::middleware('localization')->group(function () {
 	Route::post('/localize', [LocalizeController::class, 'store']);
 
 	Route::post('/forgot-password', [PasswordController::class, 'PostResetEmail'])->name('password.email');
-	Route::get('/reset-password/{token}', [PasswordController::class, 'showResetForm'])->name('password.reset');
 	Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
