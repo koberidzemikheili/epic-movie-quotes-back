@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PasswordRequest\EmailRequest;
 use App\Http\Requests\PasswordRequest\ResetRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
 
 class PasswordController extends Controller
 {
-	public function postResetEmail(EmailRequest $request)
+	public function postResetEmail(EmailRequest $request): JsonResponse
 	{
 		$request->validate(['email' => 'required|email']);
 
@@ -25,14 +24,7 @@ class PasswordController extends Controller
 					: response()->json(['status2' => __($status)], 201);
 	}
 
-	public function showResetForm(Request $request, $token = null): View
-	{
-		return view('password-reset.newpassword')->with(
-			['token' => $token, 'email' => $request->email]
-		);
-	}
-
-	public function reset(ResetRequest $request)
+	public function reset(ResetRequest $request): JsonResponse
 	{
 		$status = Password::reset(
 			$request->only('email', 'password', 'password_confirmation', 'token'),

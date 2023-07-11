@@ -8,14 +8,15 @@ use App\Http\Resources\QuoteResource;
 use App\Models\Quote;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class QuoteController extends Controller
 {
-	public function getQuotes(Request $request)
+	public function getQuotes(Request $request): AnonymousResourceCollection
 	{
-		$search = $request->get('searchBy');
+		$search = $request->searchBy;
 		$query = Quote::query();
 
 		if ($search) {
@@ -48,11 +49,11 @@ class QuoteController extends Controller
 		return QuoteResource::collection($quotes);
 	}
 
-	public function index($id): JsonResponse
+	public function show(Quote $quote): JsonResponse
 	{
-		$quote = Quote::with(['comments' => function ($query) {
+		$quote->load(['comments' => function ($query) {
 			$query->orderBy('created_at', 'desc');
-		}, 'comments.user', 'likes', 'user', 'movie'])->find($id);
+		}, 'comments.user', 'likes', 'user', 'movie']);
 
 		if (!$quote) {
 			return response()->json(['error' => 'Quote not found'], 404);
@@ -63,12 +64,14 @@ class QuoteController extends Controller
 
 	public function store(StoreQuoteRequest $request): JsonResponse
 	{
-		Quote::create([
-			'title'       => $request->title,
-			'movie_id'    => $request->movie_id,
-			'quote_image' => $request->file('quote_image')->store('quote_images'),
+		$validated = $request->validated();
+
+		$data = array_merge($validated, [
 			'user_id'     => Auth::id(),
+			'quote_image' => $request->file('quote_image')->store('quote_images'),
 		]);
+
+		Quote::create($data);
 
 		return response()->json(['message' => 'Quote created successfully'], 201);
 	}
@@ -77,16 +80,18 @@ class QuoteController extends Controller
 	{
 		$this->authorize('update', $quote);
 
+		$validated = $request->validated();
+
 		if ($request->hasFile('quote_image')) {
 			Storage::delete($quote->quote_image);
-			$quote->quote_image = $request->file('quote_image')->store('quote_images');
+			$validated['quote_image'] = $request->file('quote_image')->store('quote_images');
+		} else {
+			unset($validated['quote_image']);
 		}
 
-		$quote->update([
-			'title'       => ['en' => $request->title['en'], 'ka' => $request->title['ka']],
-			'user_id'     => Auth::id(),
-			'quote_image' => $quote->quote_image,
-		]);
+		$validated['user_id'] = Auth::id();
+
+		$quote->update($validated);
 
 		return response()->json(['message' => 'success'], 200);
 	}

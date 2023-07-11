@@ -8,14 +8,8 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-	public function markAsSeen($id): JsonResponse
+	public function markAsSeen(Notification $notification): JsonResponse
 	{
-		$notification = Notification::find($id);
-
-		if (!$notification) {
-			return response()->json(['message' => 'Notification not found'], 404);
-		}
-
 		$notification->is_seen = true;
 		$notification->save();
 

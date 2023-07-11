@@ -11,6 +11,9 @@ use App\Notifications\CustomVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\CustomResetPasswordNotification;
 use App\Notifications\CustomVerifyNewEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -64,7 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
 		$this->notify(new CustomResetPasswordNotification($url));
 	}
 
-	public function sendNewEmailVerificationNotification()
+	public function sendNewEmailVerificationNotification(): void
 	{
 		$this->notify(new CustomVerifyNewEmail);
 	}
@@ -79,32 +82,32 @@ class User extends Authenticatable implements MustVerifyEmail
 		}
 	}
 
-	public function movies()
+	public function movies(): HasMany
 	{
 		return $this->hasMany(Movie::class);
 	}
 
-public function quotes()
+public function quotes(): HasMany
 {
 	return $this->hasMany(Quote::class);
 }
 
-public function comments()
+public function comments(): HasMany
 {
 	return $this->hasMany(Comment::class);
 }
 
-public function notificationsReceived()
+public function notificationsReceived(): MorphMany
 {
 	return $this->morphMany(Notification::class, 'receiver');
 }
 
-public function notificationsSent()
+public function notificationsSent(): MorphMany
 {
 	return $this->morphMany(Notification::class, 'actor');
 }
 
-public function likes()
+public function likes(): BelongsToMany
 {
 	return $this->belongsToMany(Quote::class)->withPivot('id', 'user_id', 'quote_id');
 }

@@ -9,12 +9,12 @@ class UserOwnershipPolicy
 {
 	use HandlesAuthorization;
 
-	public function update(User $user, $item)
+	public function update(User $user, $item): bool
 	{
 		return $user->id === $item->user_id;
 	}
 
-	public function delete(User $user, $item)
+	public function delete(User $user, $item): bool
 	{
 		return $user->id === $item->user_id;
 	}
