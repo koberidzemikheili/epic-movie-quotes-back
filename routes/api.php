@@ -28,11 +28,11 @@ Route::middleware('localization')->group(function () {
 	Route::post('/login', [AuthController::class, 'login']);
 	Route::post('/localize', [LocalizeController::class, 'store']);
 
-	Route::post('/forgot-password', [PasswordController::class, 'PostResetEmail'])->name('password.email');
+	Route::post('/forgot-password', [PasswordController::class, 'postResetEmail'])->name('password.email');
 	Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 	Route::get('/verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
-	Route::get('/verify-new-email/{id}/{hash}', [VerificationController::class, 'verifyNewEmail'])->middleware(['signed'])->name('verification.verify.new.email');
+	Route::get('/verify-new-email/{id}/{hash}', [VerificationController::class, 'verifyNewEmail'])->middleware(['signed'])->name('verification.verify_new_email');
 
 	Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 		Route::post('/logout', [AuthController::class, 'logout']);
