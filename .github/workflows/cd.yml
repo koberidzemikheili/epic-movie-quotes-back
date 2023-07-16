@@ -20,6 +20,6 @@ jobs:
             cd mikheil-koberidze-epic-movie-quotes-back
             git pull
             composer install
-            yes
             php artisan migrate:fresh --seed
+            yes
           EOF

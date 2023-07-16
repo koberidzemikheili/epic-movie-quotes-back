@@ -50,7 +50,7 @@ class CustomVerifyNewEmail extends Notification implements ShouldQueue
 	protected function verificationUrl($notifiable): string
 	{
 		return URL::temporarySignedRoute(
-			'verification.verify.new.email',
+			'verification.verify_new_email',
 			now()->addMinutes(60),
 			['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->new_email)]
 		);
