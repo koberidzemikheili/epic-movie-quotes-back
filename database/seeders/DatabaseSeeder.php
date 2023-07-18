@@ -28,9 +28,9 @@ class DatabaseSeeder extends Seeder
 		];
 
 		foreach ($genres as $genreData) {
-			$genre = new Genre();
-			$genre->setTranslations('genre', $genreData);
-			$genre->save();
+			Genre::create([
+				'genre' => $genreData,
+			]);
 		}
 	}
 }
