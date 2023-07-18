@@ -14,10 +14,23 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		$genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Drama', 'Horror', 'Mystery', 'Romance', 'Thriller', 'Fantasy'];
+		$genres = [
+			['en' => 'Action', 'ka' => 'მოქმედება'],
+			['en' => 'Adventure', 'ka' => 'თავგადასავლები'],
+			['en' => 'Animation', 'ka' => 'ანიმაცია'],
+			['en' => 'Comedy', 'ka' => 'კომედია'],
+			['en' => 'Drama', 'ka' => 'დრამა'],
+			['en' => 'Horror', 'ka' => 'საშინელება'],
+			['en' => 'Mystery', 'ka' => 'მისტიური'],
+			['en' => 'Romance', 'ka' => 'რომანტიკა'],
+			['en' => 'Thriller', 'ka' => 'თრილერი'],
+			['en' => 'Fantasy', 'ka' => 'ფანტასტიკა'],
+		];
 
-		foreach ($genres as $genre) {
-			Genre::create(['genre' => $genre]);
+		foreach ($genres as $genreData) {
+			$genre = new Genre();
+			$genre->setTranslations('genre', $genreData);
+			$genre->save();
 		}
 	}
 }
